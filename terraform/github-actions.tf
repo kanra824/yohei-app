@@ -29,9 +29,11 @@ resource "aws_iam_role" "github_actions_role" {
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
+          StringLike = {
+            "token.actions.githubusercontent.com:sub" = "repo:kanra824/yohei-app:*"
+          }
           StringEquals = {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
-            "token.actions.githubusercontent.com:sub" = "repo:kanra824/yohei-app:ref:refs/heads/main"
           }
         }
       }
