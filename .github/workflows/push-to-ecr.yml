@@ -38,6 +38,7 @@ jobs:
             docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com
 
       - name: Build and push Docker image to ECR
+        id: build-image
         run: |
           AWS_ACCOUNT_ID=${{ steps.ecr-login.outputs.aws_account_id }}
           REPO_URL=${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/yohei-app
@@ -50,7 +51,26 @@ jobs:
           docker push ${REPO_URL}:sha-${COMMIT_HASH}
           docker push ${REPO_URL}:latest
           
+          echo "image=${REPO_URL}:latest" >> $GITHUB_OUTPUT
           echo "Image pushed: ${REPO_URL}:latest (sha-${COMMIT_HASH})"
 
-      - name: Notify on success
-        run: echo "✓ Docker image successfully pushed to ECR"
+      - name: Deploy to ECS
+        run: |
+          # ECS サービスを強制的に新しいデプロイメントで更新
+          aws ecs update-service \
+            --cluster yohei-app-cluster \
+            --service yohei-app-service \
+            --force-new-deployment \
+            --region ap-northeast-1
+          
+          echo "✓ ECS service deployment initiated"
+
+      - name: Wait for deployment to complete
+        run: |
+          echo "Waiting for ECS deployment to stabilize..."
+          aws ecs wait services-stable \
+            --cluster yohei-app-cluster \
+            --services yohei-app-service \
+            --region ap-northeast-1
+          
+          echo "✓ ECS deployment completed successfully"
