@@ -15,9 +15,9 @@ resource "aws_iam_openid_connect_provider" "github" {
   }
 }
 
-# --- GitHub Actions ECR Push IAM Role --------------------------------------
-resource "aws_iam_role" "github_actions_ecr" {
-  name = "github-actions-ecr-push"
+# --- GitHub Actions IAM Role -----------------------------------------------
+resource "aws_iam_role" "github_actions_role" {
+  name = "github-actions-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -39,14 +39,14 @@ resource "aws_iam_role" "github_actions_ecr" {
   })
 
   tags = {
-    Name = "github-actions-ecr-push"
+    Name = "github-actions-role"
   }
 }
 
 # --- ECR Push Permission Policy -------------------------------------------
 resource "aws_iam_role_policy" "github_actions_ecr_push" {
   name = "ecr-push-policy"
-  role = aws_iam_role.github_actions_ecr.id
+  role = aws_iam_role.github_actions_role.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -68,6 +68,32 @@ resource "aws_iam_role_policy" "github_actions_ecr_push" {
           "ecr:CompleteLayerUpload",
         ]
         Resource = aws_ecr_repository.app.arn
+      },
+    ]
+  })
+}
+
+# --- ECS Deploy Permission Policy ------------------------------------------
+resource "aws_iam_role_policy" "github_actions_ecs_deploy" {
+  name = "ecs-deploy-policy"
+  role = aws_iam_role.github_actions_role.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ecs:UpdateService",
+          "ecs:DescribeServices",
+        ]
+        Resource = aws_ecs_service.app.id
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "iam:PassRole",
+        ]
+        Resource = aws_iam_role.ecs_task_execution.arn
       },
     ]
   })
