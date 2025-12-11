@@ -20,7 +20,7 @@ async fn main() {
 }
 
 async fn root() -> &'static str {
-    "Hello from Axum!"
+    "kanra824 is here!"
 }
 
 async fn health() -> Json<Health> {
