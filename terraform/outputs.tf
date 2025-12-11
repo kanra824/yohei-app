@@ -17,3 +17,13 @@ output "ecs_service_name" {
   value       = aws_ecs_service.app.name
   description = "The name of the ECS service"
 }
+
+output "github_actions_role_arn" {
+  value       = aws_iam_role.github_actions_ecr.arn
+  description = "ARN of the IAM role for GitHub Actions to assume for ECR push"
+}
+
+output "github_actions_role_name" {
+  value       = aws_iam_role.github_actions_ecr.name
+  description = "Name of the IAM role for GitHub Actions"
+}
