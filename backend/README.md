@@ -1,16 +1,13 @@
-# Axum App (minimal scaffold)
+# yohei-app
 
-This is a minimal Axum scaffold created for you.
+## ローカルで実行
+```
+docker compose up
 
-Run locally:
-
-```bash
-cd backend/axum-app
-cargo run
+# ブラウザで localhost:8000 にアクセス
 ```
 
-The server listens on `127.0.0.1:3000` and exposes:
-- `GET /` -> plain text
-- `GET /health` -> JSON { "status": "ok" }
-
-Dependencies: `axum`, `tokio`, `tracing`, `tower-http`.
+## ECR に push (TODO: CI 生やす)
+```
+./scripts/push_to_ecr.sh
+```
