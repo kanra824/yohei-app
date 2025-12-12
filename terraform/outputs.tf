@@ -27,3 +27,13 @@ output "github_actions_role_name" {
   value       = aws_iam_role.github_actions_role.name
   description = "Name of the IAM role for GitHub Actions"
 }
+
+output "domain_name" {
+  value       = "https://kanra824.com"
+  description = "The domain name of the application"
+}
+
+output "certificate_arn" {
+  value       = aws_acm_certificate.main.arn
+  description = "ARN of the ACM certificate"
+}
